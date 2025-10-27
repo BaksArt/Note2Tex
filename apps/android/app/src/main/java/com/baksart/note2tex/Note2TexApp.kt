@@ -28,6 +28,9 @@ object Routes {
     const val ResetConfirm = "resetConfirm"
     const val Verify = "verify"
     const val Main = "main"
+    const val Recognize = "recognize"
+
+    const val Ocr = "ocr"
 }
 
 @Composable
@@ -149,9 +152,40 @@ fun Note2TexApp(initialIntent: Intent?) {
 
             composable(Routes.Main) {
                 MainScreen(
-                    onCreateProject = { /* TODO: диалог Новый проект */ }
+                    onCreateProject = { /* опционально */ },
+                    onImportReady = { uri ->
+                        val encoded = android.net.Uri.encode(uri.toString())
+                        nav.navigate("${Routes.Recognize}?uri=$encoded")
+                    }
                 )
             }
+
+            composable(
+                route = Routes.Recognize + "?uri={uri}",
+                arguments = listOf(navArgument("uri") { type = NavType.StringType; defaultValue = "" })
+            ) { entry ->
+                val uriStr = entry.arguments?.getString("uri").orEmpty()
+                val uri = android.net.Uri.parse(uriStr)
+                com.baksart.note2tex.ui.imports.RecognizeScreen(
+                    imageUri = uri,
+                    onNext = { readyUri ->
+                        val encoded = android.net.Uri.encode(readyUri.toString())
+                        nav.navigate("${Routes.Ocr}?uri=$encoded")
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.Ocr + "?uri={uri}",
+                arguments = listOf(navArgument("uri") { type = NavType.StringType; defaultValue = "" })
+            ) { entry ->
+                val uri = android.net.Uri.parse(entry.arguments?.getString("uri").orEmpty())
+                com.baksart.note2tex.ui.ocr.OcrScreen(
+                    imageUri = uri,
+                    onExport = { /* TODO: переход к экспорту /сохранению проекта */ }
+                )
+            }
+
         }
     }
 }
