@@ -1,0 +1,45 @@
+name: Backend Tests
+
+on:
+  push:
+    paths:
+      - "Note2Tex/apps/backend/**"
+      - ".github/workflows/backend-tests.yml"
+  pull_request:
+    paths:
+      - "Note2Tex/apps/backend/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Note2Tex/apps/backend
+
+    env:
+      JWT_SECRET: "testsecret"
+      JWT_ALG: "HS256"
+      JWT_EXPIRE_MIN: "15"
+      FREE_PAGES_PER_MONTH: "10"
+      FREE_MAX_PROJECTS: "5"
+
+      PYTHONPATH: "."
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest -q
