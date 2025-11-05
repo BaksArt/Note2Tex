@@ -16,29 +16,25 @@ jobs:
       run:
         working-directory: apps/backend
 
-    env:
-      PYTHONPATH: "${{ github.workspace }}/apps/backend"
-      JWT_SECRET: "testsecret"
-      JWT_ALG: "HS256"
-      JWT_EXPIRE_MIN: "15"
-      FREE_PAGES_PER_MONTH: "10"
-      FREE_MAX_PROJECTS: "5"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug paths (print tree)
+      - name: Debug filesystem
         run: |
-          pwd
+          echo "WORKDIR=$(pwd)"
+          echo "--- ls . ---"
           ls -la
-          echo "---- tree (2 levels up) ----"
+          echo "--- ls app ---"
+          ls -la app || true
+          echo "--- tree two levels up ---"
           cd ../..
           ls -la
-          echo "---- list apps/backend ----"
-          ls -la apps/backend
-          echo "---- list apps/backend/app ----"
-          ls -la apps/backend/app
+          echo "--- echo GITHUB_WORKSPACE ---"
+          echo "$GITHUB_WORKSPACE"
+          echo "--- ensure absolute path to backend ---"
+          ls -la "$GITHUB_WORKSPACE/apps/backend" || true
+          ls -la "$GITHUB_WORKSPACE/apps/backend/app" || true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -51,8 +47,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Export PYTHONPATH
+        run: |
+          echo "PYTHONPATH=$GITHUB_WORKSPACE/apps/backend" >> $GITHUB_ENV
+          echo "PYTHONPATH now set to:"
+          cat $GITHUB_ENV | sed -n 's/^PYTHONPATH=//p'
+
       - name: Sanity import check
-        run: python -c "import sys; print('sys.path[0]=',sys.path[0]); import app; print('import app OK')"
+        run: |
+          python -c "import sys, os; print('sys.path[0]=', sys.path[0]); print('PYTHONPATH=', os.environ.get('PYTHONPATH')); import app; print('import app OK, app path =', app.__file__)"
 
       - name: Run tests
-        run: pytest -q
+        run: |
+          PYTHONPATH=$GITHUB_WORKSPACE/apps/backend pytest -q
