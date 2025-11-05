@@ -3,11 +3,11 @@ name: Backend Tests
 on:
   push:
     paths:
-      - "pps/backend/**"
+      - "apps/backend/**"
       - ".github/workflows/backend-tests.yml"
   pull_request:
     paths:
-      - "Note2Tex/apps/backend/**"
+      - "apps/backend/**"
 
 jobs:
   test:
@@ -17,17 +17,28 @@ jobs:
         working-directory: apps/backend
 
     env:
+      PYTHONPATH: "${{ github.workspace }}/apps/backend"
       JWT_SECRET: "testsecret"
       JWT_ALG: "HS256"
       JWT_EXPIRE_MIN: "15"
       FREE_PAGES_PER_MONTH: "10"
       FREE_MAX_PROJECTS: "5"
 
-      PYTHONPATH: "."
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Debug paths (print tree)
+        run: |
+          pwd
+          ls -la
+          echo "---- tree (2 levels up) ----"
+          cd ../..
+          ls -la
+          echo "---- list apps/backend ----"
+          ls -la apps/backend
+          echo "---- list apps/backend/app ----"
+          ls -la apps/backend/app
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -40,6 +51,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Sanity import check
+        run: python -c "import sys; print('sys.path[0]=',sys.path[0]); import app; print('import app OK')"
+
       - name: Run tests
-        run: |
-          pytest -q
+        run: pytest -q
