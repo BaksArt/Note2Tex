@@ -9,7 +9,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.baksart.note2tex.presentation.viewmodel.UiState
 import kotlinx.coroutines.flow.StateFlow
-
+import com.baksart.note2tex.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
@@ -31,7 +31,8 @@ fun SignUpScreen(
         state.message?.let { msg -> snack.showSnackbar(msg); onMessageConsumed() }
     }
 
-    Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text("Регистрация") }) },
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text(ctx.getString(R.string.signup_title)) }) },
         snackbarHost = { SnackbarHost(snack) }
     ) { p ->
         Box(
@@ -49,22 +50,22 @@ fun SignUpScreen(
             ) {
                 OutlinedTextField(
                     value = email, onValueChange = { email = it },
-                    label = { Text("Email") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    label = { Text(ctx.getString(R.string.signup_email_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = username, onValueChange = { username = it },
-                    label = { Text("Имя пользователя") },
+                    label = { Text(ctx.getString(R.string.signup_username_label)) },
                     singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = pass, onValueChange = { pass = it },
-                    label = { Text("Пароль") },
+                    label = { Text(ctx.getString(R.string.signup_password_label)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = passRepeat, onValueChange = { passRepeat = it },
-                    label = { Text("Повторите пароль") },
+                    label = { Text(ctx.getString(R.string.signup_password_repeat_label)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
@@ -76,10 +77,10 @@ fun SignUpScreen(
                 Button(
                     onClick = {
                         localError = when {
-                            email.isBlank() || !email.contains('@') -> "Введите корректный email"
-                            username.isBlank() -> "Введите имя пользователя"
-                            pass.length < 6 -> "Пароль должен быть не короче 6 символов"
-                            pass != passRepeat -> "Пароли не совпадают"
+                            email.isBlank() || !email.contains('@') -> ctx.getString(R.string.signup_error_email)
+                            username.isBlank() -> ctx.getString(R.string.signup_error_username)
+                            pass.length < 6 -> ctx.getString(R.string.signup_error_password)
+                            pass != passRepeat -> ctx.getString(R.string.signup_error_password_mismatch)
                             else -> null
                         }
                         if (localError == null) {
@@ -88,13 +89,13 @@ fun SignUpScreen(
                     },
                     enabled = !state.loading,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(if (state.loading) "Создаём…" else "Создать аккаунт") }
+                ) { Text(if (state.loading) ctx.getString(R.string.signup_creating) else ctx.getString(R.string.signup_button)) }
 
                 OutlinedButton(
                     onClick = onGoSignIn,
                     enabled = !state.loading,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Уже есть аккаунт — Войти") }
+                ) { Text(ctx.getString(R.string.signup_have_account)) }
             }
         }
     }

@@ -21,7 +21,7 @@ okhttp = "5.2.1"
 moshi = "1.15.1"
 datastore = "1.1.1"
 
-ucrop = "2.2.9"
+ucrop = "2.2.11"
 coil = "2.6.0"
 
 [libraries]

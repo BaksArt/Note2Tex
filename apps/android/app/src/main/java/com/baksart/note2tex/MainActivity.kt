@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-
-class MainActivity : ComponentActivity() {
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
     private var latestIntent by mutableStateOf<Intent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {

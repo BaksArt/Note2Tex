@@ -10,7 +10,7 @@ import com.baksart.note2tex.presentation.viewmodel.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
+import com.baksart.note2tex.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResetPasswordScreen(
@@ -40,8 +40,9 @@ fun ResetPasswordScreen(
         }
     }
 
+    val ctx = androidx.compose.ui.platform.LocalContext.current
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Сброс пароля") }) },
+        topBar = { CenterAlignedTopAppBar(title = { Text(ctx.getString(R.string.reset_title)) }) },
         snackbarHost = { SnackbarHost(snack) }
     ) { p ->
         Box(
@@ -67,9 +68,9 @@ fun ResetPasswordScreen(
 
                 val buttonEnabled = !state.loading && email.isNotBlank() && cooldown == 0
                 val buttonText = when {
-                    state.loading -> "Отправляем…"
-                    cooldown > 0  -> "Отправить снова через ${cooldown}s"
-                    else          -> if (state.message == null) "Отправить" else "Отправить снова"
+                    state.loading -> ctx.getString(R.string.reset_sending)
+                    cooldown > 0  -> ctx.getString(R.string.reset_resend_in, cooldown)
+                    else          -> if (state.message == null) ctx.getString(R.string.reset_send) else ctx.getString(R.string.reset_resend)
                 }
 
                 Button(

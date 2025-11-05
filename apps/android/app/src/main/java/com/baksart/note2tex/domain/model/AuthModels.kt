@@ -6,4 +6,9 @@ data class ForgotReq(val email: String)
 data class ResetPwdReq(val token: String, val newPassword: String)
 
 data class TokenRes(val accessToken: String)
-data class ErrorRes(val error: String, val message: String?)
+data class ErrorRes(
+    val error: String? = null,
+    val message: String? = null,
+    val detail: String? = null,
+    val detailed: String? = null
+)

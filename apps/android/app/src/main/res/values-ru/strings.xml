@@ -1,0 +1,187 @@
+<resources>
+    <string name="app_name">Note2Tex</string>
+
+    <!-- Common -->
+    <string name="ok">Готово</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="share">Поделиться</string>
+    <string name="export">Экспорт</string>
+    <string name="format">Формат</string>
+    <string name="back">Назад</string>
+    <string name="next">Далее</string>
+    <string name="preview">Предпросмотр</string>
+    <string name="loading">Загрузка…</string>
+    <string name="untitled">untitled</string>
+    <string name="menu">Меню</string>
+    <string name="error_unknown">Ошибка</string>
+
+    <!-- Theme -->
+    <string name="theme">Тема</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+
+    <!-- Language -->
+    <string name="language">Язык</string>
+    <string name="language_system">Системный</string>
+    <string name="language_ru">Русский</string>
+    <string name="language_en">English</string>
+
+    <!-- Splash -->
+    <string name="splash_title">Note2Tex</string>
+    <string name="splash_subtitle">Преобразование рукописных заметок в LaTeX</string>
+
+    <!-- Auth -->
+    <string name="signin_title">Вход</string>
+    <string name="signin_login_label">Email или имя пользователя</string>
+    <string name="signin_password_label">Пароль</string>
+    <string name="signin_button">Войти</string>
+    <string name="signin_entering">Входим…</string>
+    <string name="signin_forgot">Забыли пароль?</string>
+    <string name="signup_title">Регистрация</string>
+    <string name="signup_email_label">Email</string>
+    <string name="signup_username_label">Имя пользователя</string>
+    <string name="signup_password_label">Пароль</string>
+    <string name="signup_password_repeat_label">Повторите пароль</string>
+    <string name="signup_button">Создать аккаунт</string>
+    <string name="signup_creating">Создаем…</string>
+    <string name="signup_have_account">Уже есть аккаунт — Войти</string>
+    <string name="signup_error_email">Введите корректный email</string>
+    <string name="signup_error_username">Введите имя пользователя</string>
+    <string name="signup_error_password">Пароль должен быть не короче 6 символов</string>
+    <string name="signup_error_password_mismatch">Пароли не совпадают</string>
+    <string name="reset_title">Сброс пароля</string>
+    <string name="reset_send">Отправить</string>
+    <string name="reset_resend">Отправить снова</string>
+    <string name="reset_resend_in">Отправить снова через %1$d</string>
+    <string name="reset_sending">Отправляем…</string>
+    <string name="reset_new_title">Новый пароль</string>
+    <string name="reset_new_password">Новый пароль</string>
+    <string name="reset_repeat_password">Повторите пароль</string>
+    <string name="verify_title">Подтверждение email</string>
+    <string name="verify_wait_text">Мы отправили письмо на %1$s.</string>
+    <string name="verify_use_link">Перейдите по ссылке из письма, чтобы завершить регистрацию.</string>
+    <string name="error_generic">Ошибка</string>
+    <string name="auth_check_email">Проверьте почту</string>
+    <string name="auth_mail_sent">Письмо отправлено</string>
+    <string name="auth_forgot_hint">Если email существует — письмо отправлено</string>
+    <string name="auth_password_updated">Пароль обновлён</string>
+
+    <!-- Main -->
+    <string name="tab_projects">Проекты</string>
+    <string name="tab_settings">Настройки</string>
+    <string name="add_image">Добавить изображение</string>
+    <string name="image_source">Источник изображения</string>
+    <string name="from_file">Из файла</string>
+    <string name="from_camera">С камеры</string>
+    <string name="crop_title">Обрезка</string>
+
+    <!-- Projects -->
+    <string name="projects_title">Проекты</string>
+    <string name="projects_refresh">Обновить</string>
+    <string name="projects_empty">Проектов пока нет</string>
+    <string name="selected_count">Выбрано: %1$d</string>
+    <string name="rename">Переименовать</string>
+    <string name="rename_project">Переименовать проект</string>
+    <string name="name">Название</string>
+    <string name="description">Описание</string>
+    <string name="really_delete_one">Действительно удалить «%1$s»? Действие необратимо.</string>
+    <string name="really_delete_many">Действительно удалить %1$d проектов? Действие необратимо.</string>
+    <string name="zip_saved">ZIP сохранён</string>
+    <string name="skipped_n">Пропущено: %1$d (нет ссылки для выбранного формата)</string>
+    <string name="no_image">Нет\nизображения</string>
+    <string name="project_status">Статус проекта: %1$s</string>
+    <string name="project_not_created">Проект еще не создан</string>
+    <string name="rating_send_error">Ошибка оценивания</string>
+
+    <!-- Strings used inside export / share flows -->
+    <string name="export_subject">Note2Tex экспорт</string>
+    <string name="export_title">Распознанный документ из Note2Tex</string>
+    <string name="zip_filename">note2tex_projects.zip</string>
+    <string name="export_share_title">Поделиться документом</string>
+    <string name="zip_share_title">Поделиться ZIP-архивом</string>
+    <string name="zip_share_subject">Note2Tex Projects</string>
+    <string name="zip_build_readme">В ZIP не попали файлы: сервер не вернул ссылки для выбранного формата.</string>
+    <string name="export_error_toast">Ошибка экспорта: %1$s</string>
+    <string name="error_file_make">Не удалось подготовить файл: %1$s</string>
+    <string name="several_projects">несколько проектов</string>
+
+    <!-- Status -->
+    <string name="status_ready">Готово</string>
+    <string name="status_processing">В обработке</string>
+    <string name="status_failed">Ошибка</string>
+
+    <!-- OCR -->
+    <string name="ocr_title">Распознавание</string>
+    <string name="view">Просмотр</string>
+    <string name="edit">Редактировать</string>
+    <string name="rebuild">Пересобрать</string>
+    <string name="pdf_missing">PDF не получен</string>
+    <string name="docx_missing">DOCX недоступен (сервер не вернул ссылку)</string>
+    <string name="processing">Обработка…</string>
+    <string name="rate_title">Оцените результат</string>
+    <string name="rate_prompt">Помогла ли генерация? Поставьте оценку и при желании оставьте комментарий.</string>
+    <string name="rate_thanks">Спасибо за оценку!</string>
+    <string name="rate_error">Не удалось поставить оценку</string>
+    <string name="rate_comment_label">Комментарий</string>
+    <string name="comment_optional">Комментарий (по желанию)</string>
+
+    <!-- PDF Viewer -->
+    <string name="pdf_not_found">PDF пустой или не найден</string>
+    <string name="pdf_no_pages">PDF без страниц</string>
+    <string name="error_open_pdf">Не удалось открыть pdf: %1$s</string>
+    <string name="error_render_pdf">Ошибка рендера: %1$s</string>
+    <string name="next_pdf">След.</string>
+    <string name="prev_pdf">Пред.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="account">Аккаунт</string>
+    <string name="refresh">Обновить</string>
+    <string name="failed_to_load">Не удалось загрузить данные</string>
+    <string name="plan_label">Тариф: %1$s</string>
+    <string name="plan_premium">Премиум</string>
+    <string name="plan_free">Free</string>
+    <string name="quota_month">Месячная квота</string>
+    <string name="quota_total">Общая квота</string>
+    <string name="change_password">Сменить пароль</string>
+    <string name="logout">Выйти из аккаунта</string>
+    <string name="app_settings">Настройки приложения</string>
+
+    <!-- Export formats -->
+    <string name="fmt_pdf">PDF</string>
+    <string name="fmt_tex">LaTeX</string>
+    <string name="fmt_docx">DOCX</string>
+
+    <!-- Buttons / bottom sheets -->
+    <string name="action">Действие</string>
+    <string name="save_to_device">Сохранить на устройство</string>
+    <string name="share_file">Поделиться</string>
+
+    <!-- A11y / content descriptions -->
+    <string name="cd_export">Экспорт</string>
+    <string name="cd_delete">Удалить</string>
+    <string name="cd_refresh">Обновить</string>
+    <string name="cd_back">Отмена</string>
+
+    <!-- Subscriptions -->
+    <string name="sub_title">Подписка</string>
+    <string name="sub_features_title">Возможности подписки</string>
+    <string name="sub_feat_unlimited_month">Неограниченное количество проектов в месяц</string>
+    <string name="sub_feat_unlimited_history">Неограниченное количество сохранённых проектов в истории</string>
+    <string name="sub_feat_unlock_premium">Разблокировка всех премиум-функций</string>
+    <string name="sub_choose_period">Выберите период</string>
+    <string name="sub_period_month">1 месяц</string>
+    <string name="sub_period_month_desc">Стартовый план на месяц</string>
+    <string name="sub_period_quarter">3 месяца</string>
+    <string name="sub_period_quarter_desc">Выгоднее на 10%</string>
+    <string name="sub_period_year">12 месяцев</string>
+    <string name="sub_period_year_desc">Максимальная выгода</string>
+    <string name="sub_pay">Оплатить</string>
+    <string name="sub_cancel">Отменить подписку</string>
+    <string name="sub_granted">Премиум активирован</string>
+    <string name="sub_revoked">Премиум отключён</string>
+
+</resources>

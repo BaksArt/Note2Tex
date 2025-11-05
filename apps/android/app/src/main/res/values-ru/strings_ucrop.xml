@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ucrop_crop">Кадр</string>
+    <string name="ucrop_rotate">Поворот</string>
+    <string name="ucrop_scale">Масштаб</string>
+    <string name="ucrop_label_aspect_ratio">Пропорции</string>
+
+
+    <string name="ucrop_label_original">Ориг.</string>
+</resources>

@@ -24,6 +24,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.Note2Tex">
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -46,14 +47,13 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="app" android:host="auth"/>
+                <data android:scheme="note2tex" android:host="auth"/>
             </intent-filter>
         </activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Note2Tex.UCrop.NoActionBar" /> />
+            android:screenOrientation="portrait"/> />
     </application>
 
 </manifest>

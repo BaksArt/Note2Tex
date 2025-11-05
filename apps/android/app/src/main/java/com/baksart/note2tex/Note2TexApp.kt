@@ -1,8 +1,13 @@
 package com.baksart.note2tex
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -10,6 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.baksart.note2tex.domain.model.AppLanguage
+import com.baksart.note2tex.domain.model.AppTheme
 import com.baksart.note2tex.presentation.viewmodel.AuthViewModel
 import com.baksart.note2tex.ui.auth.ResetNewPasswordScreen
 import com.baksart.note2tex.ui.auth.ResetPasswordScreen
@@ -17,7 +24,10 @@ import com.baksart.note2tex.ui.auth.SignInScreen
 import com.baksart.note2tex.ui.auth.SignUpScreen
 import com.baksart.note2tex.ui.auth.VerifyEmailScreen
 import com.baksart.note2tex.ui.main.MainScreen
+import com.baksart.note2tex.ui.ocr.OcrScreen
 import com.baksart.note2tex.ui.theme.Note2TexTheme
+import com.baksart.note2tex.presentation.viewmodel.SettingsViewModel
+import com.baksart.note2tex.ui.main.SubscribeScreen
 
 object Routes {
 
@@ -29,20 +39,41 @@ object Routes {
     const val Verify = "verify"
     const val Main = "main"
     const val Recognize = "recognize"
-
     const val Ocr = "ocr"
+    const val Subscribe = "subscribe"
 }
 
 @Composable
-fun Note2TexApp(initialIntent: Intent?) {
+fun Note2TexApp(
+    initialIntent: Intent?,
+    vmSettings: SettingsViewModel = viewModel(),   // <-- ViewModel с темой
+) {
     val nav = rememberNavController()
     val vm: AuthViewModel = viewModel()
+
+    // читаем выбранную тему из SettingsViewModel
+    val theme by vmSettings.theme.collectAsState()
+    val useDark = when (theme) {
+        AppTheme.DARK -> true
+        AppTheme.LIGHT -> false
+        AppTheme.SYSTEM -> isSystemInDarkTheme()
+    }
+    val language by vmSettings.language.collectAsState()
+
+    LaunchedEffect(language) {
+        val locales = when (language) {
+            AppLanguage.SYSTEM -> LocaleListCompat.getEmptyLocaleList()
+            AppLanguage.RU     -> LocaleListCompat.forLanguageTags("ru")
+            AppLanguage.EN     -> LocaleListCompat.forLanguageTags("en")
+        }
+        AppCompatDelegate.setApplicationLocales(locales)
+    }
 
     LaunchedEffect(initialIntent) {
         initialIntent?.let { nav.handleDeepLink(it) }
     }
 
-    Note2TexTheme {
+    Note2TexTheme(useDarkTheme = useDark) {
         NavHost(navController = nav, startDestination = Routes.Splash) {
 
             composable(Routes.Splash) {
@@ -107,7 +138,7 @@ fun Note2TexApp(initialIntent: Intent?) {
                     navArgument("email")       { type = NavType.StringType; defaultValue = "" }
                 ),
                 deepLinks = listOf(
-                    navDeepLink { uriPattern = "app://auth/verify?accessToken={accessToken}" }
+                    navDeepLink { uriPattern = "note2tex://auth/verify?accessToken={accessToken}" }
                 )
             ) { entry ->
                 val token = entry.arguments?.getString("accessToken").orEmpty()
@@ -134,7 +165,7 @@ fun Note2TexApp(initialIntent: Intent?) {
                     navArgument("token") { type = NavType.StringType; defaultValue = "" }
                 ),
                 deepLinks = listOf(
-                    navDeepLink { uriPattern = "app://auth/reset-ok?token={token}" }
+                    navDeepLink { uriPattern = "note2tex://auth/reset-ok?token={token}" }
                 )
             ) { entry ->
                 val token = entry.arguments?.getString("token").orEmpty()
@@ -156,7 +187,20 @@ fun Note2TexApp(initialIntent: Intent?) {
                     onImportReady = { uri ->
                         val encoded = android.net.Uri.encode(uri.toString())
                         nav.navigate("${Routes.Recognize}?uri=$encoded")
-                    }
+                    },
+                    onOpenProject = { projectId ->
+                        nav.navigate("ocrProject/$projectId")
+                    },
+                    onChangePassword = {
+                        nav.navigate(Routes.Reset)
+                    },
+                    onLoggedOut = {
+                        nav.navigate(Routes.SignIn) {
+                            popUpTo(Routes.Main) { inclusive = true }
+                        }
+                    },
+                    onOpenSubscription = { nav.navigate(Routes.Subscribe) },
+                    vmSettings = vmSettings
                 )
             }
 
@@ -182,10 +226,25 @@ fun Note2TexApp(initialIntent: Intent?) {
                 val uri = android.net.Uri.parse(entry.arguments?.getString("uri").orEmpty())
                 com.baksart.note2tex.ui.ocr.OcrScreen(
                     imageUri = uri,
-                    onExport = { /* TODO: переход к экспорту /сохранению проекта */ }
+                    onExport = { /* TODO: переход к экспорту /сохранению проекта */ },
+                    onBack = { nav.popBackStack() }
                 )
             }
 
+            composable(
+                route = "ocrProject/{projectId}",
+                arguments = listOf(navArgument("projectId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val pid = backStackEntry.arguments?.getString("projectId")!!
+                // Открываем экран распознавания по ID проекта.
+                // imageUri не передаём (null), только projectId
+                OcrScreen(imageUri = null, projectId = pid, onBack = { nav.popBackStack() })
+            }
+
+            composable(Routes.Subscribe) {
+                SubscribeScreen(onBack = { nav.popBackStack() })
+            }
+        }
+
         }
     }
-}

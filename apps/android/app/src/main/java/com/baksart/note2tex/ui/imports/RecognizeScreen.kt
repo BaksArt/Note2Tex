@@ -14,15 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-
+import com.baksart.note2tex.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecognizeScreen(
     imageUri: Uri,
     onNext: (Uri) -> Unit
 ) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Предпросмотр") }) }
+        topBar = { CenterAlignedTopAppBar(title = { Text(ctx.getString(R.string.preview)) }) }
     ) { p ->
         Column(
             Modifier
@@ -49,7 +50,7 @@ fun RecognizeScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text("Далее")
+                Text(ctx.getString(R.string.next))
             }
         }
     }

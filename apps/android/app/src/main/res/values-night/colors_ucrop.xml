@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Верхняя панель -->
+    <color name="ucrop_color_toolbar">#FF1E1E1E</color>   <!-- = DarkColors.surface -->
+    <color name="ucrop_color_statusbar">#FF82B1FF</color> <!-- = DarkColors.primary -->
+
+    <!-- Текст/иконки тулбара -->
+    <color name="ucrop_color_toolbar_widget">#FFFFFFFF</color>
+
+    <!-- Активные акценты -->
+    <color name="ucrop_color_widget_active">#FF82B1FF</color> <!-- primary (dark) -->
+
+    <!-- Иконки по умолчанию -->
+    <color name="ucrop_color_widget">#B3FFFFFF</color>
+
+    <!-- Подписи и выбранные подписи -->
+    <color name="ucrop_color_widget_text">#80FFFFFF</color>
+    <color name="ucrop_color_widget_text_selected">#FFFFFF</color>
+
+    <!-- Круговой индикатор -->
+    <color name="ucrop_color_progress_wheel_line">#FF82B1FF</color>
+
+    <!-- Рамка/сетка -->
+    <color name="ucrop_color_default_crop_frame">#B3FFFFFF</color>
+    <color name="ucrop_color_default_crop_grid">#33FFFFFF</color>
+
+    <!-- Тёмный подвал с инструментами -->
+    <color name="ucrop_color_controls_footer">#FF1E1E1E</color>
+
+    <!-- Фон виджета -->
+    <color name="ucrop_color_widget_background">#FF1E1E1E</color>
+
+    <color name="ucrop_color_controls_wrapper">#FF1E1E1E</color>
+</resources>
+

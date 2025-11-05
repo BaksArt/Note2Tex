@@ -3,9 +3,10 @@ package com.baksart.note2tex.presentation.viewmodel
 import android.app.Application
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.baksart.note2tex.data.repo.ExportRepository
+import com.baksart.note2tex.R
 import com.baksart.note2tex.data.repo.OcrRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +22,14 @@ data class OcrUiState(
     val message: String? = null,
     val imageUri: Uri? = null,
     val latex: String = "",
+    val serverLatex: String = "",
     val pdfFile: File? = null,
     val mode: OcrMode = OcrMode.PreviewPdf,
     val pdfPageIndex: Int = 0,
     val pdfPageCount: Int = 0,
-    val docxConverting: Boolean = false,
-    val docxFile: File? = null
+    val docxUrl: String? = null,
+    val projectId: String? = null,
+    val edited: Boolean = false
 )
 
 class OcrViewModel(
@@ -36,74 +39,179 @@ class OcrViewModel(
 
     constructor(app: Application) : this(app, OcrRepository(app))
 
+    private val ctx = app.applicationContext
+
     private val _state = MutableStateFlow(OcrUiState())
     val state: StateFlow<OcrUiState> = _state
 
-    private val exportRepo by lazy { ExportRepository(getApplication()) }
+    private fun msg(@StringRes id: Int, vararg args: Any): String =
+        ctx.getString(id, *args.map { it as Any }.toTypedArray())
 
     fun start(imageUri: Uri) {
         _state.value = OcrUiState(loading = true, imageUri = imageUri)
         viewModelScope.launch {
             try {
-                val r = repo.infer(imageUri)
-                val pdfUrl = pickPdfUrl(r)
+                val projectId = repo.createProjectPublic(imageUri)
+                val ready = repo.pollProjectUntilReadyPublic(projectId)
+                val latex = ready.texUrl?.let { withContext(Dispatchers.IO) { repo.fetchTextPublic(it) } }.orEmpty()
+                val pdfUrl = ready.pdfUrl
                 val pdfFile = pdfUrl?.let { withContext(Dispatchers.IO) { repo.downloadPdf(it) } }
-
                 _state.value = _state.value.copy(
                     loading = false,
                     message = null,
-                    latex = r.latex.orEmpty(),
+                    imageUri = imageUri,
+                    latex = latex,
+                    serverLatex = latex,
                     pdfFile = pdfFile,
-                    mode = OcrMode.PreviewPdf
+                    docxUrl = ready.docxUrl,
+                    mode = OcrMode.PreviewPdf,
+                    projectId = projectId,
+                    edited = false
                 )
-
-                startDocxConversionIfNeeded()
             } catch (t: Throwable) {
-                val msg = "${t.javaClass.simpleName}: ${t.message ?: "без сообщения"}"
                 Log.e("OcrVM", "Infer failed", t)
-                _state.value = _state.value.copy(loading = false, message = msg)
+                _state.value = _state.value.copy(
+                    loading = false,
+                    message = t.message ?: msg(R.string.error_unknown)
+                )
             }
         }
     }
 
-    private fun pickPdfUrl(resp: Any): String? = try {
-        val k = resp::class
-        val url = k.members.firstOrNull { it.name == "pdf_url" }?.call(resp) as? String
-        val path = k.members.firstOrNull { it.name == "pdf_path" }?.call(resp) as? String
-        when {
-            !url.isNullOrBlank() -> url
-            !path.isNullOrBlank() -> {
-                val base = repo.baseUrl.trimEnd('/') + "/files/"
-                val name = path.substringAfterLast('\\').substringAfterLast('/')
-                if (name.isNotBlank()) base + name else null
-            }
-            else -> null
-        }
-    } catch (_: Throwable) { null }
-
-    fun setMode(mode: OcrMode) { _state.value = _state.value.copy(mode = mode) }
-    fun updateLatex(newLatex: String) { _state.value = _state.value.copy(latex = newLatex) }
-    fun consumeMessage() { _state.value = _state.value.copy(message = null) }
-
-    fun reconvertDocx() {
-        _state.value = _state.value.copy(docxFile = null)
-        startDocxConversionIfNeeded()
-    }
-
-    private fun startDocxConversionIfNeeded() {
-        val s = _state.value
-        if (s.latex.isBlank() || s.docxConverting) return
-
-        _state.value = s.copy(docxConverting = true)
+    fun openExisting(projectId: String) {
+        _state.value = OcrUiState(loading = true, projectId = projectId)
         viewModelScope.launch {
             try {
-                val f = exportRepo.requestDocx(_state.value.latex)
-                _state.value = _state.value.copy(docxConverting = false, docxFile = f)
+                val pr = repo.getProjectOnce(projectId)
+                val imgUri = pr.imageUrl?.let { Uri.parse(it) }
+                when (pr.status.lowercase()) {
+                    "ready" -> {
+                        val latex = pr.texUrl?.let { withContext(Dispatchers.IO) { repo.fetchTextPublic(it) } }.orEmpty()
+                        val pdfFile = pr.pdfUrl?.let { withContext(Dispatchers.IO) { repo.downloadPdf(it) } }
+                        _state.value = _state.value.copy(
+                            loading = false,
+                            message = null,
+                            imageUri = imgUri,
+                            latex = latex,
+                            serverLatex = latex,
+                            pdfFile = pdfFile,
+                            docxUrl = pr.docxUrl,
+                            mode = OcrMode.PreviewPdf,
+                            projectId = projectId,
+                            edited = false
+                        )
+                    }
+                    "processing" -> {
+                        _state.value = _state.value.copy(
+                            loading = true,
+                            message = null,
+                            imageUri = imgUri,
+                            latex = "",
+                            serverLatex = "",
+                            pdfFile = null,
+                            docxUrl = pr.docxUrl,
+                            mode = OcrMode.PreviewPdf,
+                            projectId = projectId,
+                            edited = false
+                        )
+                        launch {
+                            try {
+                                val ready = repo.pollProjectUntilReadyPublic(projectId)
+                                val latex = ready.texUrl?.let {
+                                    withContext(Dispatchers.IO) { repo.fetchTextPublic(it) }
+                                }.orEmpty()
+                                val pdfFile = ready.pdfUrl?.let {
+                                    withContext(Dispatchers.IO) { repo.downloadPdf(it) }
+                                }
+                                _state.value = _state.value.copy(
+                                    loading = false,
+                                    latex = latex,
+                                    serverLatex = latex,
+                                    pdfFile = pdfFile,
+                                    docxUrl = ready.docxUrl,
+                                    mode = OcrMode.PreviewPdf,
+                                    edited = false
+                                )
+                            } catch (t: Throwable) {
+                                _state.value = _state.value.copy(
+                                    loading = false,
+                                    message = t.message ?: msg(R.string.error_unknown)
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        _state.value = _state.value.copy(
+                            loading = false,
+                            imageUri = imgUri,
+                            message = msg(R.string.project_status, pr.status)
+                        )
+                    }
+                }
             } catch (t: Throwable) {
-                Log.e("OcrVM", "DOCX convert failed", t)
                 _state.value = _state.value.copy(
-                    docxConverting = false,
-                    message = "DOCX: ${t.message ?: "ошибка конвертации"}"
+                    loading = false,
+                    message = t.message ?: msg(R.string.error_unknown)
+                )
+            }
+        }
+    }
+
+    fun setMode(mode: OcrMode) { _state.value = _state.value.copy(mode = mode) }
+
+    fun updateLatex(newLatex: String) {
+        val was = _state.value
+        _state.value = was.copy(latex = newLatex, edited = (newLatex != was.serverLatex))
+    }
+
+    fun consumeMessage() { _state.value = _state.value.copy(message = null) }
+
+    fun rebuild() {
+        val st = _state.value
+        val pid = st.projectId ?: run {
+            _state.value = st.copy(message = msg(R.string.project_not_created))
+            return
+        }
+        val tex = st.latex
+        _state.value = st.copy(loading = true)
+        viewModelScope.launch {
+            try {
+                repo.updateProjectTex(pid, tex)
+                val ready = repo.pollProjectUntilReadyPublic(pid)
+                val newLatex = ready.texUrl?.let { withContext(Dispatchers.IO) { repo.fetchTextPublic(it) } }.orEmpty()
+                val pdfUrl = ready.pdfUrl
+                val pdfFile = pdfUrl?.let { withContext(Dispatchers.IO) { repo.downloadPdf(it) } }
+                _state.value = _state.value.copy(
+                    loading = false,
+                    message = null,
+                    latex = newLatex,
+                    serverLatex = newLatex,
+                    edited = false,
+                    pdfFile = pdfFile,
+                    docxUrl = ready.docxUrl,
+                    mode = OcrMode.PreviewPdf
+                )
+            } catch (t: Throwable) {
+                Log.e("OcrVM", "Rebuild failed", t)
+                _state.value = _state.value.copy(
+                    loading = false,
+                    message = t.message ?: msg(R.string.error_unknown)
+                )
+            }
+        }
+    }
+
+    suspend fun downloadToCache(url: String, outName: String): File =
+        withContext(Dispatchers.IO) { repo.downloadFile(url, outName) }
+
+    fun sendRating(value: Int, comment: String?) {
+        val pid = state.value.projectId ?: return
+        viewModelScope.launch {
+            try {
+                repo.sendRating(pid, value, comment ?: "")
+            } catch (t: Throwable) {
+                _state.value = _state.value.copy(
+                    message = msg(R.string.rating_send_error, t.message ?: msg(R.string.error_unknown))
                 )
             }
         }

@@ -14,6 +14,7 @@ data class OcrResponse(
     val tex_url: String? = null,
     val csv_url: String? = null,
     val pdf_url: String? = null,
+    val docx_url: String? = null,
     val tex_path: String? = null,
     val csv_path: String? = null,
     val pdf_path: String? = null,

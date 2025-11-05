@@ -9,7 +9,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.baksart.note2tex.presentation.viewmodel.UiState
 import kotlinx.coroutines.flow.StateFlow
-
+import com.baksart.note2tex.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
@@ -28,8 +28,9 @@ fun SignInScreen(
         state.message?.let { msg -> snack.showSnackbar(msg); onMessageConsumed() }
     }
 
+    val ctx = androidx.compose.ui.platform.LocalContext.current
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Вход") }) },
+        topBar = { CenterAlignedTopAppBar(title = { Text(ctx.getString(R.string.signin_title))}) },
         snackbarHost = { SnackbarHost(snack) }
     ) { p ->
         Box(
@@ -47,12 +48,12 @@ fun SignInScreen(
             ) {
                 OutlinedTextField(
                     value = login, onValueChange = { login = it },
-                    label = { Text("Email или имя пользователя") },
+                    label = { Text(ctx.getString(R.string.signin_login_label)) },
                     singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = pass, onValueChange = { pass = it },
-                    label = { Text("Пароль") },
+                    label = { Text(ctx.getString(R.string.signin_password_label)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
@@ -60,12 +61,12 @@ fun SignInScreen(
                     onClick = { onSignIn(login.trim(), pass) },
                     enabled = !state.loading,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(if (state.loading) "Входим…" else "Войти") }
+                ) { Text(if (state.loading) ctx.getString(R.string.signin_entering) else ctx.getString(R.string.signin_button)) }
 
-                TextButton(onClick = onGoReset, enabled = !state.loading) { Text("Забыли пароль?") }
+                TextButton(onClick = onGoReset, enabled = !state.loading) { Text(ctx.getString(R.string.signin_forgot)) }
                 OutlinedButton(
                     onClick = onGoSignUp, enabled = !state.loading, modifier = Modifier.fillMaxWidth()
-                ) { Text("Создать аккаунт") }
+                ) { Text(ctx.getString(R.string.signup_button)) }
             }
         }
     }

@@ -24,7 +24,12 @@ class AuthRepository(
     private fun <T> Response<T>.toErr(): AuthResult.Err {
         val txt = errorBody()?.string().orEmpty()
         val parsed = runCatching { errorAdapter.fromJson(txt) }.getOrNull()
-        return AuthResult.Err(code(), parsed?.error, parsed?.message ?: txt)
+        val human = parsed?.message
+            ?: parsed?.detail
+            ?: parsed?.detailed
+            ?: parsed?.error
+            ?: if (txt.trim().startsWith("{")) null else txt // если «сырой» текст — отдадим его
+        return AuthResult.Err(code(), parsed?.error, human)
     }
 
     suspend fun register(email: String, username: String, password: String): AuthResult<Unit> = safe {
@@ -67,6 +72,10 @@ class AuthRepository(
         throw ce
     } catch (t: Throwable) {
         AuthResult.Err(null, "network_error", t.message)
+    }
+
+    suspend fun logout() {
+        tokenStore.setToken(null)
     }
 
     suspend fun hasToken(): Boolean = !tokenStore.getToken().isNullOrBlank()

@@ -57,7 +57,7 @@ fun SplashScreen(
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Преобразование рукописных заметок в LaTeX",
+                text = "LaTeX",
                 fontSize = 16.sp,
                 color = Color.Gray
             )

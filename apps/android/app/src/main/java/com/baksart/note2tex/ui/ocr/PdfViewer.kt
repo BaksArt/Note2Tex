@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.max
 import kotlin.math.roundToInt
-
+import com.baksart.note2tex.R
 @Composable
 fun PdfViewer(
     file: File,
@@ -40,19 +41,20 @@ fun PdfViewer(
     val density = LocalDensity.current
     val screenWidthPx = with(density) { (config.screenWidthDp.dp).toPx() }.roundToInt()
 
+    val ctx = LocalContext.current
     DisposableEffect(file) {
         try {
             Log.d("PdfViewer", "open file=${file.absolutePath}, size=${file.length()}")
             if (!file.exists() || file.length() == 0L) {
-                error = "PDF пустой или не найден (${file.absolutePath})"
+                error = ctx.getString(R.string.pdf_not_found)
             } else {
                 pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
                 renderer = PdfRenderer(pfd!!)
                 pageCount = renderer?.pageCount ?: 0
-                if (pageCount == 0) error = "PDF без страниц"
+                if (pageCount == 0) error =  ctx.getString(R.string.pdf_no_pages)
             }
         } catch (t: Throwable) {
-            error = "Не удалось открыть PDF: ${t.message}"
+            error = ctx.getString(R.string.error_open_pdf, t.message)
             Log.e("PdfViewer", "open error", t)
         }
 
@@ -84,14 +86,14 @@ fun PdfViewer(
                     Log.d("PdfViewer", "render page=$idx pw=$pw ph=$ph -> target=$targetW x $targetH")
 
                     val bmp = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
-                    bmp.eraseColor(Color.WHITE) // белый фон
+                    bmp.eraseColor(Color.WHITE)
                     val dest = Rect(0, 0, targetW, targetH)
                     page.render(bmp, dest, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bmp
                 }
             } catch (t: Throwable) {
                 Log.e("PdfViewer", "render error", t)
-                error = "Ошибка рендера: ${t.message}"
+                error = ctx.getString(R.string.error_render_pdf, t.message)
                 null
             }
         }
@@ -129,14 +131,14 @@ fun PdfViewer(
                 Button(
                     onClick = { if (pageIndex > 0) pageIndex-- },
                     enabled = pageIndex > 0
-                ) { Text("Пред.") }
+                ) { Text(ctx.getString(R.string.prev_pdf)) }
 
                 Text("Стр. ${if (pageCount == 0) 0 else pageIndex + 1} / $pageCount")
 
                 Button(
                     onClick = { if (pageIndex < pageCount - 1) pageIndex++ },
                     enabled = pageIndex < pageCount - 1
-                ) { Text("След.") }
+                ) { Text(ctx.getString(R.string.next_pdf)) }
             }
         }
     }

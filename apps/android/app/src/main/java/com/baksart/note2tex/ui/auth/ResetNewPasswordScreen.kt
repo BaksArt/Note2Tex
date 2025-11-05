@@ -5,8 +5,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.baksart.note2tex.R
 import com.baksart.note2tex.presentation.viewmodel.UiState
 import kotlinx.coroutines.flow.StateFlow
 
@@ -25,12 +27,19 @@ fun ResetNewPasswordScreen(
     var localError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(state.message) {
-        state.message?.let { msg -> snack.showSnackbar(msg); onMessageConsumed() }
+        state.message?.let { msg ->
+            snack.showSnackbar(msg)
+            onMessageConsumed()
+        }
     }
 
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Новый пароль") }) },
-        snackbarHost = { SnackbarHost(snack) }
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = stringResource(R.string.reset_new_title)) }
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = snack) }
     ) { p ->
         Box(
             modifier = Modifier
@@ -46,34 +55,49 @@ fun ResetNewPasswordScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 OutlinedTextField(
-                    value = p1, onValueChange = { p1 = it },
-                    label = { Text("Новый пароль") },
+                    value = p1,
+                    onValueChange = { p1 = it },
+                    label = { Text(stringResource(R.string.reset_new_password)) },
                     visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true, modifier = Modifier.fillMaxWidth()
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
-                    value = p2, onValueChange = { p2 = it },
-                    label = { Text("Повторите пароль") },
+                    value = p2,
+                    onValueChange = { p2 = it },
+                    label = { Text(stringResource(R.string.reset_repeat_password)) },
                     visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true, modifier = Modifier.fillMaxWidth()
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 if (!localError.isNullOrBlank()) {
-                    Text(localError!!, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = localError!!,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
 
+                val ctx = androidx.compose.ui.platform.LocalContext.current
                 Button(
                     onClick = {
                         localError = when {
-                            p1.length < 6 -> "Пароль должен быть не короче 6 символов"
-                            p1 != p2 -> "Пароли не совпадают"
+                            p1.length < 6 -> ctx.getString(R.string.signup_error_password)
+                            p1 != p2 -> ctx.getString(R.string.signup_error_password_mismatch)
                             else -> null
                         }
                         if (localError == null) onSubmit(p1)
                     },
                     enabled = !state.loading,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(if (state.loading) "Сохраняем…" else "Сохранить") }
+                ) {
+                    Text(
+                        text = if (state.loading)
+                            stringResource(R.string.loading)
+                        else
+                            stringResource(R.string.save)
+                    )
+                }
             }
         }
     }

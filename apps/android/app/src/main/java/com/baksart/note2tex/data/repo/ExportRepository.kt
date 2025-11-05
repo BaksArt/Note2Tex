@@ -20,7 +20,7 @@ data class ConvertDocxResp(val docx_url: String?)
 
 class ExportRepository(
     private val context: Context,
-    private val baseUrl: String = "http://192.168.50.68:8003"
+    private val baseUrl: String = "https://note2tex.baksart.ru"
 ) {
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)

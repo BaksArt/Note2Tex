@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Верхняя панель -->
+    <color name="ucrop_color_toolbar">#FFFFFFFF</color>
+    <color name="ucrop_color_statusbar">#FF4C8BF5</color> <!-- = LightColors.primary -->
+
+    <!-- Текст/иконки тулбара -->
+    <color name="ucrop_color_toolbar_widget">#FF000000</color>
+
+    <!-- Активные акценты (ползунки, иконки активных контролов) -->
+    <color name="ucrop_color_widget_active">#FF4C8BF5</color> <!-- primary -->
+
+    <!-- Иконки по умолчанию -->
+    <color name="ucrop_color_widget">#99000000</color>
+
+    <!-- Подписи и выбранные подписи -->
+    <color name="ucrop_color_widget_text">#99000000</color>
+    <color name="ucrop_color_widget_text_selected">#FF000000</color>
+
+
+    <!-- Круговой индикатор -->
+    <color name="ucrop_color_progress_wheel_line">#FF4C8BF5</color>
+
+    <!-- Рамка/сетка кадрирования -->
+    <color name="ucrop_color_default_crop_frame">#B3000000</color>
+    <color name="ucrop_color_default_crop_grid">#33000000</color>
+
+    <!-- Подвал с кнопками (вкладками) -->
+    <color name="ucrop_color_controls_footer">#FFFFFFFF</color>
+    <color name="ucrop_color_controls_wrapper">#FF1E1E1E</color>
+
+    <!-- Фон виджета (например, кнопки) -->
+    <color name="ucrop_color_widget_background">#FFFFFFFF</color>
+
+    
+
+</resources>

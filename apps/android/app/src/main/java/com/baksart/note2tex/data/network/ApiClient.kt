@@ -47,6 +47,10 @@ class ApiClient(
         .build()
 
     val authApi: AuthApi = retrofit.create(AuthApi::class.java)
+    val accountApi: AccountApi = retrofit.create(AccountApi::class.java)
+
+   val premiumApi: PremiumApi = retrofit.create(PremiumApi::class.java)
+
 
     fun moshi() = moshi
 }
